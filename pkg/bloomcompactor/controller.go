@@ -15,6 +15,8 @@ import (
 )
 
 type SimpleBloomController struct {
+	tenant         string
+	limits         Limits
 	ownershipRange v1.FingerprintBounds // ownership range of this controller
 	tsdbStore      TSDBStore
 	metaStore      MetaStore
@@ -28,6 +30,8 @@ type SimpleBloomController struct {
 }
 
 func NewSimpleBloomController(
+	tenant string,
+	limits Limits,
 	ownershipRange v1.FingerprintBounds,
 	tsdbStore TSDBStore,
 	metaStore MetaStore,
@@ -38,6 +42,8 @@ func NewSimpleBloomController(
 	logger log.Logger,
 ) *SimpleBloomController {
 	return &SimpleBloomController{
+		tenant:         tenant,
+		limits:         limits,
 		ownershipRange: ownershipRange,
 		tsdbStore:      tsdbStore,
 		metaStore:      metaStore,
@@ -95,6 +101,11 @@ func (s *SimpleBloomController) do(ctx context.Context) error {
 		return errors.Wrap(err, "failed to create plan")
 	}
 
+	nGramSize := s.limits.BloomNGramLength(s.tenant)
+	nGramSkip := s.limits.BloomNGramSkip(s.tenant)
+	maxBlockSize := s.limits.BloomCompactorMaxBlockSize(s.tenant)
+	blockOpts := v1.NewBlockOptions(nGramSize, nGramSkip, maxBlockSize)
+
 	// 5. Generate Blooms
 	// Now that we have the gaps, we will generate a bloom block for each gap.
 	// We can accelerate this by using existing blocks which may already contain
@@ -122,7 +133,7 @@ func (s *SimpleBloomController) do(ctx context.Context) error {
 			}
 
 			gen := NewSimpleBloomGenerator(
-				v1.DefaultBlockOptions, // TODO(salvacorts) make block options configurable
+				blockOpts,
 				seriesItr,
 				s.chunkLoader,
 				preExistingBlocks,

@@ -220,7 +220,7 @@ func (bq *BlockQuerier) CheckChunksForSeries(fp model.Fingerprint, chks ChunkRef
 outer:
 	for _, chk := range inBlooms {
 		// Get buf to concatenate the chunk and search token
-		tokenBuf, prefixLen = prefixedToken(schema.NGramLen(), chk, tokenBuf)
+		tokenBuf, prefixLen = prefixedToken(int(schema.NGramLen()), chk, tokenBuf)
 		for _, search := range searches {
 			tokenBuf = append(tokenBuf[:prefixLen], search...)
 

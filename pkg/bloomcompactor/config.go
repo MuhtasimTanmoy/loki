@@ -44,7 +44,8 @@ type Limits interface {
 	BloomCompactorChunksBatchSize(userID string) int
 	BloomCompactorMaxTableAge(tenantID string) time.Duration
 	BloomCompactorEnabled(tenantID string) bool
-	BloomNGramLength(tenantID string) int
-	BloomNGramSkip(tenantID string) int
+	BloomNGramLength(tenantID string) uint64
+	BloomNGramSkip(tenantID string) uint64
 	BloomFalsePositiveRate(tenantID string) float64
+	BloomCompactorMaxBlockSize(tenantID string) uint64
 }

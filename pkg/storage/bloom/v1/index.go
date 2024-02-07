@@ -26,12 +26,12 @@ func (s Schema) Compatible(other Schema) bool {
 	return s == other
 }
 
-func (s Schema) NGramLen() int {
-	return int(s.nGramLength)
+func (s Schema) NGramLen() uint64 {
+	return s.nGramLength
 }
 
-func (s Schema) NGramSkip() int {
-	return int(s.nGramSkip)
+func (s Schema) NGramSkip() uint64 {
+	return s.nGramSkip
 }
 
 // byte length
